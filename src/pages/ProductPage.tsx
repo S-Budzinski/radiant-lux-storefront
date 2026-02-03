@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import productImage from '@/assets/product-main.png';
+import ProductImageCarousel from '@/components/ProductImageCarousel';
+import ProductFeatureSections from '@/components/ProductFeatureSections';
 
 const BundleCard = ({
   option,
@@ -130,16 +132,10 @@ const ProductPage = () => {
 
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Product Image */}
+          {/* Product Image Carousel */}
           <div className="relative animate-slide-up">
             <div className="sticky top-24">
-              <div className="aspect-square rounded-2xl bg-gradient-to-br from-charcoal-light to-charcoal overflow-hidden border border-border">
-                <img
-                  src={productImage}
-                  alt={PRODUCT.name}
-                  className="w-full h-full object-contain p-8"
-                />
-              </div>
+              <ProductImageCarousel />
 
               {/* Trust badges */}
               <div className="flex justify-center mt-6">
@@ -236,6 +232,9 @@ const ProductPage = () => {
             </div>
           </div>
         </div>
+
+        {/* Product Feature Sections with alternating image-text layout */}
+        <ProductFeatureSections />
 
         {/* Product Details Section */}
         <section className="mt-16 md:mt-24">
