@@ -25,18 +25,6 @@ const Header = () => {
             >
               Produkt
             </Link>
-            <Link 
-              to="/#reviews" 
-              className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
-            >
-              Opinie
-            </Link>
-            <Link 
-              to="/#faq" 
-              className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
-            >
-              FAQ
-            </Link>
           </nav>
 
           {/* Cart */}
