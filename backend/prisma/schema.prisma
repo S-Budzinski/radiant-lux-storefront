@@ -5,20 +5,23 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // Ważne dla Vercel Postgres
 }
 
 model Product {
   id          String   @id @default(uuid())
   name        String
   description String
-  price       Int      // Cena w groszach/centach (np. 1000 = 10.00 PLN)
+  price       Int
   image       String
   createdAt   DateTime @default(now())
 }
 
 model Order {
-  id        String   @id @default(uuid())
-  amount    Int
-  status    String   @default("pending") // pending, paid
-  createdAt DateTime @default(now())
+  id            String   @id @default(uuid())
+  stripeSession String   @unique // ID sesji Stripe do weryfikacji
+  amount        Int
+  status        String   @default("pending") // pending -> paid
+  customerEmail String?
+  createdAt     DateTime @default(now())
 }
