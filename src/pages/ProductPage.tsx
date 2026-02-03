@@ -1,4 +1,4 @@
-import { Check, Shield, Truck, RefreshCw } from 'lucide-react';
+import { Check, Truck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BUNDLE_OPTIONS, PRODUCT, useCart } from '@/lib/cart';
 import { useState } from 'react';
@@ -142,18 +142,10 @@ const ProductPage = () => {
               </div>
 
               {/* Trust badges */}
-              <div className="grid grid-cols-3 gap-4 mt-6">
+              <div className="flex justify-center mt-6">
                 <div className="flex flex-col items-center text-center p-3 rounded-lg bg-card border border-border">
                   <Truck className="w-5 h-5 text-primary mb-1" />
                   <span className="text-xs text-muted-foreground">Darmowa dostawa</span>
-                </div>
-                <div className="flex flex-col items-center text-center p-3 rounded-lg bg-card border border-border">
-                  <Shield className="w-5 h-5 text-primary mb-1" />
-                  <span className="text-xs text-muted-foreground">2 lata gwarancji</span>
-                </div>
-                <div className="flex flex-col items-center text-center p-3 rounded-lg bg-card border border-border">
-                  <RefreshCw className="w-5 h-5 text-primary mb-1" />
-                  <span className="text-xs text-muted-foreground">30 dni zwrotu</span>
                 </div>
               </div>
             </div>
