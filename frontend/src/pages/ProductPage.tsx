@@ -1,156 +1,353 @@
-import { useEffect, useState } from 'react';
-import { useToast } from "@/components/ui/use-toast"; // Upewnij się, że ścieżka jest poprawna
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Loader2, Check, ShoppingCart } from "lucide-react";
-import { useCart } from "@/lib/cart"; // Zakładam, że masz context lub hooka do koszyka, jeśli nie - zobacz niżej
+import { Check, Truck } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { BUNDLE_OPTIONS, PRODUCT, useCart } from '@/lib/cart';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import productImage from '@/assets/product-main.png';
+import ProductImageCarousel from '@/components/ProductImageCarousel';
+import ProductFeatureSections from '@/components/ProductFeatureSections';
 
-// Typ produktu zgodny z bazą danych
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-}
-
-export default function ProductPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
-  // Jeśli używasz contextu koszyka (zakładam, że masz go w src/lib/cart.ts lub context)
-  // Jeśli nie masz hooka useCart, musisz go stworzyć lub użyć localStorage bezpośrednio.
-  // Tutaj zakładam prostą logikę dodawania do localStorage dla przykładu.
-  
-  const addToCart = (product: Product) => {
-    const existingCart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existingItemIndex = existingCart.findIndex((item: any) => item.id === product.id);
-
-    if (existingItemIndex > -1) {
-      existingCart[existingItemIndex].quantity += 1;
-    } else {
-      existingCart.push({ ...product, quantity: 1 });
-    }
-
-    localStorage.setItem('cart', JSON.stringify(existingCart));
-    // Wywołaj event, żeby odświeżyć licznik w nagłówku (jeśli taki masz)
-    window.dispatchEvent(new Event("storage"));
-    
-    toast({
-      title: "Dodano do koszyka",
-      description: `${product.name} jest już w Twoim koszyku.`,
-    });
-  };
-
-  useEffect(() => {
-    // Pobieranie produktów z Twojego nowego backendu
-    fetch(`${import.meta.env.VITE_API_URL}/products`)
-      .then(res => res.json())
-      .then(data => {
-        // Sortujemy po cenie, żeby mieć kolejność: 1-pak, 2-pak, 3-pak
-        const sorted = data.sort((a: Product, b: Product) => a.price - b.price);
-        setProducts(sorted);
-        if (sorted.length > 0) setSelectedId(sorted[1].id); // Domyślnie zaznacz środkowy (dwupak) - częsta taktyka sprzedażowa
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
-    return <div className="flex justify-center items-center h-screen"><Loader2 className="animate-spin h-10 w-10" /></div>;
-  }
-
-  const selectedProduct = products.find(p => p.id === selectedId) || products[0];
-
+const BundleCard = ({
+  option,
+  isSelected,
+  onSelect,
+}: {
+  option: typeof BUNDLE_OPTIONS[0];
+  isSelected: boolean;
+  onSelect: () => void;
+}) => {
   return (
-    <div className="container mx-auto px-4 py-10">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-        
-        {/* LEWA STRONA: Zdjęcie */}
-        <div className="relative aspect-square bg-gray-100 rounded-xl overflow-hidden border">
-           {selectedProduct && (
-             <img 
-               src={selectedProduct.image} 
-               alt={selectedProduct.name} 
-               className="object-cover w-full h-full hover:scale-105 transition-transform duration-500"
-             />
-           )}
-           <div className="absolute top-4 left-4">
-             <Badge className="bg-black text-white px-3 py-1">Bestseller</Badge>
-           </div>
+    <button
+      onClick={onSelect}
+      className={cn(
+        'relative w-full p-4 md:p-5 rounded-xl border-2 transition-all duration-300 text-left',
+        isSelected
+          ? 'border-primary bg-primary/5 shadow-glow'
+          : 'border-border bg-card hover:border-primary/50'
+      )}
+    >
+      {/* Badges */}
+      {option.popular && (
+        <span className="absolute -top-3 right-4 badge-popular">
+          Najczęściej wybierane
+        </span>
+      )}
+      {option.cheapest && (
+        <span className="absolute -top-3 right-4 bg-success text-primary-foreground px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+          Najlepsza cena
+        </span>
+      )}
+
+      <div className="flex items-start justify-between gap-4">
+        {/* Radio + Info */}
+        <div className="flex items-start gap-3">
+          <div
+            className={cn(
+              'mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors',
+              isSelected ? 'border-primary bg-primary' : 'border-muted-foreground'
+            )}
+          >
+            {isSelected && <Check className="w-3 h-3 text-primary-foreground" />}
+          </div>
+          <div>
+            <h3 className="font-display text-lg font-semibold text-foreground">
+              {option.label}
+            </h3>
+            <p className="text-sm text-muted-foreground">{option.description}</p>
+          </div>
         </div>
 
-        {/* PRAWA STRONA: Wybór wariantu */}
-        <div className="space-y-8">
-          <div>
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-2">Radiant Lux Serum</h1>
-            <p className="text-lg text-gray-500">
-              Rewolucyjna formuła odmładzająca. Wybierz kurację dla siebie.
-            </p>
+        {/* Price */}
+        <div className="text-right">
+          <div className="text-xl md:text-2xl font-bold text-gold">
+            {option.price} zł
           </div>
-
-          {/* Wybór wariantów */}
-          <div className="grid gap-4">
-            {products.map((product) => (
-              <div 
-                key={product.id}
-                onClick={() => setSelectedId(product.id)}
-                className={`
-                  cursor-pointer relative rounded-lg border-2 p-4 flex items-center justify-between transition-all
-                  ${selectedId === product.id ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}
-                `}
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`
-                    w-6 h-6 rounded-full border flex items-center justify-center
-                    ${selectedId === product.id ? 'border-black bg-black' : 'border-gray-300'}
-                  `}>
-                    {selectedId === product.id && <Check className="w-4 h-4 text-white" />}
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">{product.name}</h3>
-                    <p className="text-sm text-gray-500">{product.description}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className="text-xl font-bold">{(product.price / 100).toFixed(2)} zł</span>
-                  {product.id === products[2]?.id && ( // Przykład logiczny: najdroższy pakiet to "Najlepsza opcja"
-                     <Badge variant="destructive" className="ml-2 block text-[10px] mt-1">Oszczędzasz 20%</Badge>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Podsumowanie i Przycisk */}
-          <div className="pt-6 border-t border-gray-100">
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-gray-600">Suma:</span>
-              <span className="text-3xl font-bold">
-                {selectedProduct ? (selectedProduct.price / 100).toFixed(2) : "0.00"} zł
-              </span>
-            </div>
-
-            <Button 
-              size="lg" 
-              className="w-full text-lg py-6"
-              onClick={() => selectedProduct && addToCart(selectedProduct)}
-            >
-              <ShoppingCart className="mr-2 h-5 w-5" />
-              Dodaj do koszyka
-            </Button>
-            
-            <p className="text-center text-xs text-gray-400 mt-4">
-              Darmowa dostawa od 200 zł. 30 dni na zwrot. Płatność Stripe.
-            </p>
+          <div className="text-sm text-muted-foreground line-through">
+            {option.originalPrice} zł
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Savings badge */}
+      <div className="mt-3 flex items-center gap-2">
+        <span className="badge-savings">Oszczędzasz {option.savings}%</span>
+        {option.quantity > 1 && (
+          <span className="badge-bundle">Bundle</span>
+        )}
+      </div>
+    </button>
   );
-}
+};
+
+const ProductPage = () => {
+  const [selectedBundle, setSelectedBundle] = useState(BUNDLE_OPTIONS[1].id);
+  const { addItem } = useCart();
+  const navigate = useNavigate();
+
+  const selectedOption = BUNDLE_OPTIONS.find((o) => o.id === selectedBundle)!;
+
+  const handleAddToCart = () => {
+    addItem({
+      id: `${PRODUCT.id}-${selectedBundle}`,
+      name: selectedOption.quantity > 1 
+        ? `${PRODUCT.name} (Zestaw ${selectedOption.quantity} szt.)`
+        : PRODUCT.name,
+      quantity: 1,
+      price: selectedOption.price * selectedOption.quantity,
+      originalPrice: selectedOption.originalPrice * selectedOption.quantity,
+      isBundle: selectedOption.quantity > 1,
+      bundleSize: selectedOption.quantity,
+      image: productImage,
+    });
+    toast.success('Dodano do koszyka!', {
+      description: `${selectedOption.label} - ${selectedOption.price * selectedOption.quantity} zł`,
+    });
+  };
+
+  const handleBuyNow = () => {
+    addItem({
+      id: `${PRODUCT.id}-${selectedBundle}`,
+      name: selectedOption.quantity > 1 
+        ? `${PRODUCT.name} (Zestaw ${selectedOption.quantity} szt.)`
+        : PRODUCT.name,
+      quantity: 1,
+      price: selectedOption.price * selectedOption.quantity,
+      originalPrice: selectedOption.originalPrice * selectedOption.quantity,
+      isBundle: selectedOption.quantity > 1,
+      bundleSize: selectedOption.quantity,
+      image: productImage,
+    });
+    navigate('/checkout');
+  };
+
+  return (
+    <main className="pt-20 md:pt-24 pb-16">
+      {/* Promo Banner */}
+      <div className="bg-primary/10 border-b border-primary/20 py-2 text-center">
+        <p className="text-sm font-medium text-primary animate-pulse-gold">
+          🔥 Oferta ograniczona czasowo! Oszczędź do 63% - tylko dzisiaj!
+        </p>
+      </div>
+
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+          {/* Product Image Carousel */}
+          <div className="relative animate-slide-up">
+            <div className="sticky top-24">
+              <ProductImageCarousel />
+
+              {/* Trust badges */}
+              <div className="flex justify-center mt-6">
+                <div className="flex flex-col items-center text-center p-3 rounded-lg bg-card border border-border">
+                  <Truck className="w-5 h-5 text-primary mb-1" />
+                  <span className="text-xs text-muted-foreground">Darmowa dostawa</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Product Info */}
+          <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            {/* Rating */}
+            <div className="flex items-center gap-2 mb-4">
+              <div className="flex">
+                {[...Array(5)].map((_, i) => (
+                  <svg
+                    key={i}
+                    className="w-5 h-5 text-primary fill-current"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                ))}
+              </div>
+              <span className="text-sm text-foreground font-medium">„Doskonałe" 4.9/5</span>
+              <span className="text-sm text-muted-foreground">| 2,750+ recenzji</span>
+            </div>
+
+            {/* Title */}
+            <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-2">
+              {PRODUCT.name}
+            </h1>
+            <p className="text-lg text-primary font-medium mb-6">
+              {PRODUCT.tagline}
+            </p>
+
+            {/* Features */}
+            <ul className="space-y-3 mb-8">
+              {PRODUCT.features.slice(0, 3).map((feature, i) => (
+                <li key={i} className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-success/20 flex items-center justify-center">
+                    <Check className="w-3 h-3 text-success" />
+                  </div>
+                  <span className="text-foreground">{feature}</span>
+                </li>
+              ))}
+            </ul>
+
+            {/* Bundle Options */}
+            <div className="mb-6">
+              <p className="text-sm text-muted-foreground mb-4 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-warning animate-pulse" />
+                Oferta ograniczona czasowo!
+              </p>
+              <div className="space-y-3">
+                {BUNDLE_OPTIONS.map((option) => (
+                  <BundleCard
+                    key={option.id}
+                    option={option}
+                    isSelected={selectedBundle === option.id}
+                    onSelect={() => setSelectedBundle(option.id)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="space-y-3 mb-6">
+              <button
+                onClick={handleBuyNow}
+                className="w-full py-4 px-6 rounded-xl btn-gold text-lg font-bold shine-effect"
+              >
+                Kup teraz – {selectedOption.price * selectedOption.quantity} zł
+              </button>
+              <button
+                onClick={handleAddToCart}
+                className="w-full py-4 px-6 rounded-xl btn-outline-gold text-lg font-semibold"
+              >
+                Dodaj do koszyka
+              </button>
+            </div>
+
+            {/* Payment methods */}
+            <div className="flex items-center justify-center gap-4 py-4 border-t border-b border-border">
+              <span className="text-xs text-muted-foreground">Akceptujemy:</span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-medium text-foreground bg-secondary px-2 py-1 rounded">BLIK</span>
+                <span className="text-xs font-medium text-foreground bg-secondary px-2 py-1 rounded">Visa</span>
+                <span className="text-xs font-medium text-foreground bg-secondary px-2 py-1 rounded">Mastercard</span>
+                <span className="text-xs font-medium text-foreground bg-secondary px-2 py-1 rounded">Apple Pay</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Product Feature Sections with alternating image-text layout */}
+        <ProductFeatureSections />
+
+        {/* Product Details Section */}
+        <section className="mt-16 md:mt-24">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-8">
+            Dlaczego <span className="text-gold-gradient">Radianté Lux290</span>?
+          </h2>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {PRODUCT.features.map((feature, i) => (
+              <div
+                key={i}
+                className="card-luxury p-6 hover:border-primary/50 transition-colors"
+              >
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <Check className="w-5 h-5 text-primary" />
+                </div>
+                <p className="text-foreground font-medium">{feature}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Specs */}
+        <section className="mt-16 md:mt-24">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-8">
+            Specyfikacja
+          </h2>
+          <div className="max-w-2xl mx-auto card-luxury divide-y divide-border">
+            {PRODUCT.specs.map((spec, i) => (
+              <div key={i} className="flex justify-between py-4 px-6">
+                <span className="text-muted-foreground">{spec.label}</span>
+                <span className="text-foreground font-medium">{spec.value}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Reviews Section */}
+        <section id="reviews" className="mt-16 md:mt-24">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-8">
+            Co mówią nasi klienci
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                name: 'Anna K.',
+                text: 'Po 2 tygodniach stosowania widzę niesamowitą różnicę! Skóra jest bardziej jędrna i promienne.',
+              },
+              {
+                name: 'Marta S.',
+                text: 'Kupilam zestaw dla siebie i mamy - obie jesteśmy zachwycone. Świetna jakość i widoczne efekty.',
+              },
+              {
+                name: 'Karolina W.',
+                text: 'Profesjonalna jakość w domu. Moja cera nigdy nie wyglądała lepiej. Polecam każdemu!',
+              },
+            ].map((review, i) => (
+              <div key={i} className="card-luxury p-6">
+                <div className="flex mb-3">
+                  {[...Array(5)].map((_, j) => (
+                    <svg
+                      key={j}
+                      className="w-4 h-4 text-primary fill-current"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-foreground mb-4">{review.text}</p>
+                <p className="text-sm font-medium text-primary">{review.name}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section id="faq" className="mt-16 md:mt-24 max-w-2xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-8">
+            Często zadawane pytania
+          </h2>
+          <div className="space-y-4">
+            {[
+              {
+                q: 'Jak często powinienem używać maski?',
+                a: 'Zalecamy używanie maski 3-5 razy w tygodniu przez 10-20 minut na sesję dla optymalnych rezultatów.',
+              },
+              {
+                q: 'Czy maska jest bezpieczna dla mojego typu skóry?',
+                a: 'Tak, maska LED jest bezpieczna dla wszystkich typów skóry. Technologia LED nie emituje promieniowania UV.',
+              },
+              {
+                q: 'Kiedy zobaczę pierwsze efekty?',
+                a: 'Większość klientów zauważa poprawę w ciągu 2-4 tygodni regularnego stosowania.',
+              },
+            ].map((faq, i) => (
+              <details key={i} className="card-luxury group">
+                <summary className="p-5 cursor-pointer list-none flex items-center justify-between">
+                  <span className="font-medium text-foreground">{faq.q}</span>
+                  <span className="text-primary transition-transform group-open:rotate-180">
+                    ↓
+                  </span>
+                </summary>
+                <div className="px-5 pb-5 text-muted-foreground">
+                  {faq.a}
+                </div>
+              </details>
+            ))}
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+};
+
+export default ProductPage;
