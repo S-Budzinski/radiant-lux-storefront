@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  price       Int      // Cena w groszach/centach (np. 1000 = 10.00 PLN)
+  image       String
+  createdAt   DateTime @default(now())
+}
+
+model Order {
+  id        String   @id @default(uuid())
+  amount    Int
+  status    String   @default("pending") // pending, paid
+  createdAt DateTime @default(now())
+}
