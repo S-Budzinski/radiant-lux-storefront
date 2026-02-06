@@ -4,11 +4,42 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = env("DATABASE_URL") // Vercel używa puli połączeń
 }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  createdAt DateTime @default(now())
+model Product {
+  id          Int      @id @default(autoincrement())
+  sku         String   @unique
+  name        String
+  description String?
+  price       Float
+  image       String?
+  createdAt   DateTime @default(now())
+}
+
+model Order {
+  id              Int        @id @default(autoincrement())
+  stripeSessionId String?    @db.VarChar(255)
+  paymentIntentId String?    @db.VarChar(255)
+  email           String
+  phone           String
+  firstName       String
+  lastName        String
+  address         String
+  city            String
+  postalCode      String
+  totalAmount     Int
+  status          String     @default("pending")
+  createdAt       DateTime   @default(now())
+  items           OrderItem[]
+}
+
+model OrderItem {
+  id        Int    @id @default(autoincrement())
+  order     Order  @relation(fields: [orderId], references: [id])
+  orderId   Int
+  productId Int
+  name      String
+  price     Float
+  quantity  Int
 }
