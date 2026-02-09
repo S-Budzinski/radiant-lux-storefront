@@ -27,7 +27,6 @@ const BundleCard = ({
           : 'border-border bg-card hover:border-primary/50'
       )}
     >
-      {/* Badges */}
       {option.popular && (
         <span className="absolute -top-3 right-4 badge-popular">
           Najczęściej wybierane
@@ -40,7 +39,6 @@ const BundleCard = ({
       )}
 
       <div className="flex items-start justify-between gap-4">
-        {/* Radio + Info */}
         <div className="flex items-start gap-3">
           <div
             className={cn(
@@ -58,7 +56,6 @@ const BundleCard = ({
           </div>
         </div>
 
-        {/* Price */}
         <div className="text-right">
           <div className="text-xl md:text-2xl font-bold text-gold">
             {option.price} zł
@@ -69,7 +66,6 @@ const BundleCard = ({
         </div>
       </div>
 
-      {/* Savings badge */}
       <div className="mt-3 flex items-center gap-2">
         <span className="badge-savings">Oszczędzasz {option.savings}%</span>
         {option.quantity > 1 && (
@@ -88,56 +84,41 @@ const ProductPage = () => {
   const selectedOption = BUNDLE_OPTIONS.find((o) => o.id === selectedBundle)!;
 
   const handleAddToCart = () => {
+    const totalPrice = selectedOption.price * selectedOption.quantity;
+    const totalOriginalPrice = selectedOption.originalPrice * selectedOption.quantity;
     addItem({
       id: `${PRODUCT.id}-${selectedBundle}`,
       name: selectedOption.quantity > 1 
         ? `${PRODUCT.name} (Zestaw ${selectedOption.quantity} szt.)`
         : PRODUCT.name,
       quantity: 1,
-      price: selectedOption.price * selectedOption.quantity,
-      originalPrice: selectedOption.originalPrice * selectedOption.quantity,
+      price: totalPrice ,
+      originalPrice: totalOriginalPrice,
       isBundle: selectedOption.quantity > 1,
       bundleSize: selectedOption.quantity,
       image: productImage,
     });
-    toast.success('Dodano do koszyka!', {
-      description: `${selectedOption.label} - ${selectedOption.price * selectedOption.quantity} zł`,
-    });
+    toast.success('Dodano do koszyka!');
   };
 
   const handleBuyNow = () => {
-    addItem({
-      id: `${PRODUCT.id}-${selectedBundle}`,
-      name: selectedOption.quantity > 1 
-        ? `${PRODUCT.name} (Zestaw ${selectedOption.quantity} szt.)`
-        : PRODUCT.name,
-      quantity: 1,
-      price: selectedOption.price * selectedOption.quantity,
-      originalPrice: selectedOption.originalPrice * selectedOption.quantity,
-      isBundle: selectedOption.quantity > 1,
-      bundleSize: selectedOption.quantity,
-      image: productImage,
-    });
+    handleAddToCart();
     navigate('/checkout');
   };
 
   return (
     <main className="pt-20 md:pt-24 pb-16">
-      {/* Promo Banner */}
       <div className="bg-primary/10 border-b border-primary/20 py-2 text-center">
         <p className="text-sm font-medium text-primary animate-pulse-gold">
-          🔥 Oferta ograniczona czasowo! Oszczędź do 63% - tylko dzisiaj!
+          🔥 Oferta ograniczona czasowo! Oszczędź do 68%!
         </p>
       </div>
 
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Product Image Carousel */}
           <div className="relative animate-slide-up">
             <div className="sticky top-24">
               <ProductImageCarousel />
-
-              {/* Trust badges */}
               <div className="flex justify-center mt-6">
                 <div className="flex flex-col items-center text-center p-3 rounded-lg bg-card border border-border">
                   <Truck className="w-5 h-5 text-primary mb-1" />
@@ -147,17 +128,11 @@ const ProductPage = () => {
             </div>
           </div>
 
-          {/* Product Info */}
           <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
-            {/* Rating */}
             <div className="flex items-center gap-2 mb-4">
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
-                  <svg
-                    key={i}
-                    className="w-5 h-5 text-primary fill-current"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg key={i} className="w-5 h-5 text-primary fill-current" viewBox="0 0 24 24">
                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                   </svg>
                 ))}
@@ -166,15 +141,11 @@ const ProductPage = () => {
               <span className="text-sm text-muted-foreground">| 2,750+ recenzji</span>
             </div>
 
-            {/* Title */}
             <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-2">
               {PRODUCT.name}
             </h1>
-            <p className="text-lg text-primary font-medium mb-6">
-              {PRODUCT.tagline}
-            </p>
+            <p className="text-lg text-primary font-medium mb-6">{PRODUCT.tagline}</p>
 
-            {/* Features */}
             <ul className="space-y-3 mb-8">
               {PRODUCT.features.slice(0, 3).map((feature, i) => (
                 <li key={i} className="flex items-center gap-3">
@@ -186,12 +157,7 @@ const ProductPage = () => {
               ))}
             </ul>
 
-            {/* Bundle Options */}
             <div className="mb-6">
-              <p className="text-sm text-muted-foreground mb-4 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-warning animate-pulse" />
-                Oferta ograniczona czasowo!
-              </p>
               <div className="space-y-3">
                 {BUNDLE_OPTIONS.map((option) => (
                   <BundleCard
@@ -204,18 +170,11 @@ const ProductPage = () => {
               </div>
             </div>
 
-            {/* CTA Buttons */}
             <div className="space-y-3 mb-6">
-              <button
-                onClick={handleBuyNow}
-                className="w-full py-4 px-6 rounded-xl btn-gold text-lg font-bold shine-effect"
-              >
+              <button onClick={handleBuyNow} className="w-full py-4 px-6 rounded-xl btn-gold text-lg font-bold shine-effect">
                 Kup teraz – {selectedOption.price * selectedOption.quantity} zł
               </button>
-              <button
-                onClick={handleAddToCart}
-                className="w-full py-4 px-6 rounded-xl btn-outline-gold text-lg font-semibold"
-              >
+              <button onClick={handleAddToCart} className="w-full py-4 px-6 rounded-xl btn-outline-gold text-lg font-semibold">
                 Dodaj do koszyka
               </button>
             </div>

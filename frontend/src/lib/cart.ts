@@ -30,14 +30,21 @@ export const useCart = create<CartState>()(
       
       addItem: (item) => {
         set((state) => {
+          // Sprawdź, czy produkt o tym ID już istnieje
           const existingItem = state.items.find((i) => i.id === item.id);
+          
           if (existingItem) {
+            // Jeśli istnieje, zaktualizuj tylko ilość
             return {
               items: state.items.map((i) =>
-                i.id === item.id ? { ...i, quantity: i.quantity + item.quantity } : i
+                i.id === item.id 
+                  ? { ...i, quantity: i.quantity + item.quantity } 
+                  : i
               ),
             };
           }
+          
+          // Jeśli nie istnieje, dodaj jako nowy
           return { items: [...state.items, item] };
         });
       },
@@ -52,7 +59,7 @@ export const useCart = create<CartState>()(
         set((state) => ({
           items: state.items.map((i) =>
             i.id === id ? { ...i, quantity: Math.max(0, quantity) } : i
-          ).filter((i) => i.quantity > 0),
+          ).filter((i) => i.quantity > 0), // Usuń jeśli ilość spadnie do 0
         }));
       },
       
@@ -77,12 +84,12 @@ export const useCart = create<CartState>()(
       },
     }),
     {
-      name: 'radiante-cart',
+      name: 'radiante-cart', // Klucz w localStorage
     }
   )
 );
 
-// Product data
+// Dane produktu i zestawów (bez zmian, potrzebne do importów)
 export const PRODUCT = {
   id: 'radiante-lux290',
   name: 'Radianté Lux290',
@@ -111,8 +118,8 @@ export const BUNDLE_OPTIONS = [
     quantity: 1,
     label: '1 Maska',
     description: 'Normalna Cena',
-    price: 299,
-    originalPrice: 599,
+    price: 550,
+    originalPrice: 1100,
     savings: 50,
     popular: false,
     cheapest: false,
@@ -121,10 +128,10 @@ export const BUNDLE_OPTIONS = [
     id: 'double',
     quantity: 2,
     label: '2 Maski',
-    description: 'Oszczędź dodatkowe 16%',
-    price: 249,
-    originalPrice: 599,
-    savings: 58,
+    description: 'Normalna Cena',
+    price: 400,
+    originalPrice: 1100,
+    savings: 63,
     popular: true,
     cheapest: false,
   },
@@ -132,10 +139,10 @@ export const BUNDLE_OPTIONS = [
     id: 'triple',
     quantity: 3,
     label: '3 Maski',
-    description: 'Oszczędź dodatkowe 25%',
-    price: 219,
-    originalPrice: 599,
-    savings: 63,
+    description: 'Normalna Cena',
+    price: 350,
+    originalPrice: 1100,
+    savings: 68,
     popular: false,
     cheapest: true,
   },
