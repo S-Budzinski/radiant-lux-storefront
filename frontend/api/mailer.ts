@@ -27,7 +27,7 @@ export async function sendOrderEmails(details: OrderDetails) {
     address, city, postalCode, phone 
   } = details;
 
-  const totalPLN = (total / 100).toFixed(2); // Stripe trzyma kwotę w groszach
+  const totalPLN = total ;
 
   // 1. Mail do KLIENTA
   await transporter.sendMail({
@@ -41,7 +41,7 @@ export async function sendOrderEmails(details: OrderDetails) {
         <p>Twoje zamówienie <strong>#${orderId}</strong> zostało opłacone i przyjęte do realizacji.</p>
         <p>Wkrótce otrzymasz kolejną wiadomość z informacją o wysyłce.</p>
         <hr style="border: 1px solid #eee; margin: 20px 0;">
-        <p style="font-size: 12px; color: #888;">Zespół Radianté Lux</p>
+        <p style="font-size: 12px; color: #888;">Zespół Radianté</p>
       </div>
     `,
   });

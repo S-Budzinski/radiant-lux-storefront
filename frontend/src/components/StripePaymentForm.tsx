@@ -17,7 +17,7 @@ export default function StripePaymentForm() {
   };
 
   return (
-    <form onSubmit={submit} className="space-y-6 bg-slate-500">
+    <form onSubmit={submit} className="space-y-6">
       <PaymentElement />
       <button className="w-full py-4 rounded-xl btn-gold font-bold">
         Zapłać
