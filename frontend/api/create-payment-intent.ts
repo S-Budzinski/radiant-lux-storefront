@@ -33,7 +33,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // 2️⃣ Stripe
   const intent = await stripe.paymentIntents.create({
-    amount: total,
+    amount: total*100,
     currency: 'pln',
     metadata: { orderId: String(orderId) },
     automatic_payment_methods: { enabled: true },
