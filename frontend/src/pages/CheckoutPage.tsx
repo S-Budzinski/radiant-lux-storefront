@@ -228,7 +228,7 @@ const stripeAppearance = {
                 <div className="border-2 border-dashed border-border rounded-xl p-8 text-center bg-charcoal-light">
                   <Lock className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
                     {clientSecret && (
-                    <Elements stripe={stripePromise} options={{ clientSecret, appearance: stripeAppearance }}>
+                    <Elements stripe={stripePromise} options={{ clientSecret, appearance: stripeAppearance, locale: 'pl' }}>
                       <StripePaymentForm />
                     </Elements>
                   )}
