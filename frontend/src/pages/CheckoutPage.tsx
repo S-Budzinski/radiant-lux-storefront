@@ -74,7 +74,6 @@ const CheckoutPage = () => {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      items,
       email: formData.email,
       imie,
       nazwisko,
@@ -83,6 +82,7 @@ const CheckoutPage = () => {
       kod_pocztowy: formData.zip,
       telefon: formData.phone,
       total: totalPrice,
+      items,
     }),
   });
 
