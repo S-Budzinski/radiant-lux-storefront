@@ -12,17 +12,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const {
     email, imie, nazwisko,
     adres, miasto, kod_pocztowy,
-    telefon, total
+    telefon, total,
+    items
   } = req.body;
+
+  const itemsJSON = JSON.stringify(items);
 
   // 1️⃣ zapis ORDER (pending)
   const order = await sql`
     INSERT INTO orders (
-      email, total, status,
+      email, total, status, items,
       imie, nazwisko, adres, miasto, kod_pocztowy, telefon
     )
     VALUES (
-      ${email}, ${total}, 'pending',
+      ${email}, ${total}, 'pending', ${itemsJSON}
       ${imie}, ${nazwisko}, ${adres},
       ${miasto}, ${kod_pocztowy}, ${telefon}
     )

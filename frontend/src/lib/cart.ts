@@ -91,8 +91,8 @@ export const useCart = create<CartState>()(
 
 // Dane produktu i zestawów (bez zmian, potrzebne do importów)
 export const PRODUCT = {
-  id: 'radiante-lux290',
-  name: 'Radianté Lux290',
+  id: 'radiante-lux240',
+  name: 'Radianté Lux240',
   tagline: 'Profesjonalna Maska LED do Odmładzania Skóry',
   description: 'Zaawansowana technologia fototerapii LED w eleganckiej, elastycznej formie. Stworzona z myślą o profesjonalnych efektach w domowym zaciszu.',
   features: [

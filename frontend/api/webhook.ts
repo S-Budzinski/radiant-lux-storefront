@@ -38,6 +38,14 @@ export default async function handler(req: any, res: any) {
       // 3. Jeśli mamy zamówienie, wysyłamy maila
       if (rows.length > 0) {
         const order = rows[0];
+        
+        let parsedItems = [];
+        try {
+            // Sprawdzamy czy items istnieje, jak nie to pusta tablica
+            parsedItems = order.items ? JSON.parse(order.items) : [];
+        } catch (e) {
+            console.error('Błąd parsowania produktów:', e);
+        }
 
         // Wywołanie Twojego mailera (w try/catch żeby błąd maila nie wywalił webhooka)
         try {
@@ -50,7 +58,8 @@ export default async function handler(req: any, res: any) {
             address: order.adres,
             city: order.miasto,
             postalCode: order.kod_pocztowy,
-            phone: order.telefon
+            phone: order.telefon,
+            items: parsedItems
           });
           console.log(`Emails sent for order #${orderId}`);
         } catch (emailError) {

@@ -10,8 +10,8 @@ const featureSections = [
     image: productMain,
     title: 'Zaawansowana terapia LED',
     description:
-      'Maska wykorzystuje 290 diod LED o różnych długościach fal, aby skutecznie stymulować produkcję kolagenu i redukować zmarszczki. Czerwone światło przenika głęboko w skórę, przyspieszając regenerację komórkową.',
-    features: ['290 diod LED', 'Głęboka penetracja', 'Stymulacja kolagenu'],
+      'Maska wykorzystuje 240 diod LED o różnych długościach fal, aby skutecznie stymulować produkcję kolagenu i redukować zmarszczki. Czerwone światło przenika głęboko w skórę, przyspieszając regenerację komórkową.',
+    features: ['240 diod LED', 'Głęboka penetracja', 'Stymulacja kolagenu'],
   },
   {
     image: productOnBathroom,

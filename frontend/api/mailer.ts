@@ -9,6 +9,13 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+interface CartItem {
+    name: string;
+    quantity: number;
+    price: number;
+    isBundle?: boolean; 
+}
+
 interface OrderDetails {
   orderId: string;
   total: number;
@@ -19,27 +26,55 @@ interface OrderDetails {
   city: string;
   postalCode: string;
   phone: string;
+  items: CartItem[];
 }
 
 export async function sendOrderEmails(details: OrderDetails) {
   const { 
     orderId, total, customerEmail, firstName, lastName, 
-    address, city, postalCode, phone 
+    address, city, postalCode, phone, items
   } = details;
 
   const totalPLN = total ;
+
+  const productsHtml = items.map(item => `
+    <tr style="border-bottom: 1px solid #eee;">
+        <td style="padding: 8px;">${item.name} ${item.isBundle ? '<span style="color:green; font-size:10px">(Pakiet)</span>' : ''}</td>
+        <td style="padding: 8px; text-align: center;">${item.quantity}</td>
+        <td style="padding: 8px; text-align: right;">${item.price} zł</td>
+    </tr>
+  `).join('');
+
+  const productsTable = `
+    <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px;">
+        <thead>
+            <tr style="background-color: #f8f8f8; text-align: left;">
+                <th style="padding: 8px;">Produkt</th>
+                <th style="padding: 8px; text-align: center;">Ilość</th>
+                <th style="padding: 8px; text-align: right;">Cena</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${productsHtml}
+        </tbody>
+    </table>
+  `;
 
   // 1. Mail do KLIENTA
   await transporter.sendMail({
     from: `"Radianté" <${process.env.EMAIL_USER}>`,
     to: customerEmail,
-    subject: `Potwierdzenie zamówienia #${orderId} - Radianté Lux`,
+    subject: `Potwierdzenie zamówienia #${orderId} - Radianté`,
     html: `
       <div style="font-family: Arial, sans-serif; color: #333;">
         <h1 style="color: #d4af37;">Dziękujemy za zamówienie!</h1>
         <p>Cześć ${firstName},</p>
-        <p>Twoje zamówienie <strong>#${orderId}</strong> zostało opłacone i przyjęte do realizacji.</p>
-        <p>Wkrótce otrzymasz kolejną wiadomość z informacją o wysyłce.</p>
+        <p>Twoje zamówienie <strong>#${orderId}</strong> zostało opłacone.</p>
+        
+        <h3>Szczegóły zamówienia:</h3>
+        ${productsTable} 
+        
+        <p><strong>Razem: ${totalPLN} zł</strong></p>
         <hr style="border: 1px solid #eee; margin: 20px 0;">
         <p style="font-size: 12px; color: #888;">Zespół Radianté</p>
       </div>
@@ -49,29 +84,28 @@ export async function sendOrderEmails(details: OrderDetails) {
   // 2. Mail do ADMINA (Ty)
   await transporter.sendMail({
     from: `"Sklep Bot" <${process.env.EMAIL_USER}>`,
-    to: process.env.ADMIN_EMAIL, // Twój prywatny mail
-    subject: `💰 Wpadło zamówienie za ${totalPLN} zł (Zamówienie #${orderId})`,
+    to: process.env.ADMIN_EMAIL,
+    subject: `💰 Nowe zamówienie: ${totalPLN} zł (ID: ${orderId})`,
     html: `
       <div style="font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
         <h2 style="color: #2da44e; margin-top: 0;">Nowe Opłacone Zamówienie!</h2>
         
         <div style="background-color: #f6f8fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
           <p style="margin: 5px 0; font-size: 18px;"><strong>Kwota:</strong> ${totalPLN} PLN</p>
-          <p style="margin: 5px 0;"><strong>ID Zamówienia:</strong> #${orderId}</p>
-          <p style="margin: 5px 0;"><strong>Email Klienta:</strong> ${customerEmail}</p>
+          <p style="margin: 5px 0;"><strong>ID:</strong> #${orderId}</p>
+          <p style="margin: 5px 0;"><strong>Klient:</strong> ${firstName} ${lastName}</p>
         </div>
 
-        <h3>Dane do wysyłki:</h3>
-        <ul style="list-style: none; padding: 0;">
-          <li style="padding: 5px 0; border-bottom: 1px solid #eee;"><strong>Imię i nazwisko:</strong> ${firstName} ${lastName}</li>
-          <li style="padding: 5px 0; border-bottom: 1px solid #eee;"><strong>Adres:</strong> ${address}</li>
-          <li style="padding: 5px 0; border-bottom: 1px solid #eee;"><strong>Miasto:</strong> ${postalCode} ${city}</li>
-          <li style="padding: 5px 0; border-bottom: 1px solid #eee;"><strong>Telefon:</strong> ${phone}</li>
-        </ul>
+        <h3>📦 Zamówione produkty:</h3>
+        ${productsTable}
 
-        <p style="margin-top: 20px; font-size: 12px; color: #666;">
-          Wiadomość wygenerowana automatycznie przez system Vercel/Stripe.
-        </p>
+        <h3>📍 Dane do wysyłki:</h3>
+        <ul style="list-style: none; padding: 0;">
+          <li><strong>Adres:</strong> ${address}</li>
+          <li><strong>Miasto:</strong> ${postalCode} ${city}</li>
+          <li><strong>Telefon:</strong> ${phone}</li>
+          <li><strong>Email:</strong> ${customerEmail}</li>
+        </ul>
       </div>
     `,
   });
