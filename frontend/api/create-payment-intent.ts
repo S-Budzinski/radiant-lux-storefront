@@ -25,7 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       imie, nazwisko, adres, miasto, kod_pocztowy, telefon, items
     )
     VALUES (
-      ${email}, ${total}, 'pending'
+      ${email}, ${total}, 'pending',
       ${imie}, ${nazwisko}, ${adres},
       ${miasto}, ${kod_pocztowy}, ${telefon}, ${itemsJSON}
     )
