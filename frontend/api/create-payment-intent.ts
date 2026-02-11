@@ -21,13 +21,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 1️⃣ zapis ORDER (pending)
   const order = await sql`
     INSERT INTO orders (
-      email, total, status, items,
-      imie, nazwisko, adres, miasto, kod_pocztowy, telefon
+      email, total, status, 
+      imie, nazwisko, adres, miasto, kod_pocztowy, telefon, items
     )
     VALUES (
-      ${email}, ${total}, 'pending', ${itemsJSON}
+      ${email}, ${total}, 'pending'
       ${imie}, ${nazwisko}, ${adres},
-      ${miasto}, ${kod_pocztowy}, ${telefon}
+      ${miasto}, ${kod_pocztowy}, ${telefon}, ${itemsJSON}
     )
     RETURNING id
   `;
