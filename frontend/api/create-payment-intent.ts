@@ -16,7 +16,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     items
   } = req.body;
 
-  const itemsJSON = JSON.stringify(items);
+  const itemsJSON = JSON.stringify(items || []);
 
   // 1️⃣ zapis ORDER (pending)
   const order = await sql`
