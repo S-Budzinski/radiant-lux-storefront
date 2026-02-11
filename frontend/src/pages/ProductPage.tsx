@@ -4,7 +4,7 @@ import { BUNDLE_OPTIONS, PRODUCT, useCart } from '@/lib/cart';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import productImage from '@/assets/product-main.png';
+import productImage from '@/assets/3pic-mask.png';
 import ProductImageCarousel from '@/components/ProductImageCarousel';
 import ProductFeatureSections from '@/components/ProductFeatureSections';
 

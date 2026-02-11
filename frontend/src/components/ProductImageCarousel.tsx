@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import productMain from '@/assets/product-main.png';
-import productRed from '@/assets/product-red.png';
-import productFeatures from '@/assets/product-features.png';
+import productMain from '@/assets/3pic-mask.png';
+import productOnBathroom from '@/assets/maskOnBathroom.png';
+import productOnModel from '@/assets/maskOnModelBath.png';
+import productOnTop from '@/assets/maskOnTopBathroom.png';
+import productSet from '@/assets/maskSetFull.png';
 
 const images = [
   { src: productMain, alt: 'Radianté Lux290 - widok główny' },
-  { src: productRed, alt: 'Radianté Lux290 - tryb czerwony LED' },
-  { src: productFeatures, alt: 'Radianté Lux290 - cechy produktu' },
+  { src: productOnBathroom, alt: 'Radianté Lux290 - w łazience' },
+  { src: productOnModel, alt: 'Radianté Lux290 - Model' },
+  { src: productOnTop, alt: 'Radianté Lux290 - Na blacie' },
+  { src: productSet, alt: 'Radianté Lux290 - Zestaw' },
 ];
 
 const ProductImageCarousel = () => {

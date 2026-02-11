@@ -1,25 +1,27 @@
-import productMain from '@/assets/product-main.png';
-import productRed from '@/assets/product-red.png';
-import productFeatures from '@/assets/product-features.png';
+import productMain from '@/assets/3pic-mask.png';
+import productOnBathroom from '@/assets/maskOnBathroom.png';
+import productOnModel from '@/assets/maskOnModelBath.png';
+import productOnTop from '@/assets/maskOnTopBathroom.png';
+import productSet from '@/assets/maskSetFull.png';
 import { cn } from '@/lib/utils';
 
 const featureSections = [
   {
-    image: productRed,
+    image: productMain,
     title: 'Zaawansowana terapia LED',
     description:
       'Maska wykorzystuje 290 diod LED o różnych długościach fal, aby skutecznie stymulować produkcję kolagenu i redukować zmarszczki. Czerwone światło przenika głęboko w skórę, przyspieszając regenerację komórkową.',
     features: ['290 diod LED', 'Głęboka penetracja', 'Stymulacja kolagenu'],
   },
   {
-    image: productFeatures,
+    image: productOnBathroom,
     title: 'Komfort i wygoda użytkowania',
     description:
       'Zaprojektowana z myślą o maksymalnym komforcie. Ultralekka konstrukcja (tylko 0.2kg) i regulowany pasek sprawiają, że możesz cieszyć się terapią podczas codziennych czynności.',
     features: ['Waga tylko 0.2kg', 'Grubość 0.3cm', 'Regulowany pasek'],
   },
   {
-    image: productMain,
+    image: productOnModel,
     title: 'Profesjonalne rezultaty w domu',
     description:
       'Technologia stosowana w gabinetach kosmetycznych teraz dostępna w Twoim domu. Regularne stosowanie maski zapewnia widoczne efekty już po 2 tygodniach - jędrniejsza, bardziej promienna skóra.',
