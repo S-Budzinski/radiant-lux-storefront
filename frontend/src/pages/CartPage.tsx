@@ -2,12 +2,23 @@ import { Link } from 'react-router-dom';
 import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { useCart } from '@/lib/cart';
 import { cn } from '@/lib/utils';
+import ReactPixel from 'react-facebook-pixel';
 
 const CartPage = () => {
   const { items, removeItem, updateQuantity, getTotalPrice, getTotalSavings } = useCart();
 
   const totalPrice = getTotalPrice();
   const totalSavings = getTotalSavings();
+
+  const handleInitiateCheckout = () => {
+    ReactPixel.track('InitiateCheckout', {
+      value: totalPrice,
+      currency: 'PLN',
+      content_ids: items.map((item) => item.id),
+      num_items: items.reduce((acc, item) => acc + item.quantity, 0),
+      content_type: 'product'
+    });
+  };
 
   if (items.length === 0) {
     return (
@@ -155,6 +166,7 @@ const CartPage = () => {
               </div>
 
               <Link
+                onClick={handleInitiateCheckout}
                 to="/checkout"
                 className="w-full py-4 rounded-xl btn-gold flex items-center justify-center gap-2 font-bold text-lg shine-effect"
               >

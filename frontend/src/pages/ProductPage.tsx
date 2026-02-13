@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import productImage from '@/assets/3pic-mask.png';
 import ProductImageCarousel from '@/components/ProductImageCarousel';
 import ProductFeatureSections from '@/components/ProductFeatureSections';
+import ReactPixel from 'react-facebook-pixel';
 
 const BundleCard = ({
   option,
@@ -86,6 +87,13 @@ const ProductPage = () => {
   const handleAddToCart = () => {
     const totalPrice = selectedOption.price * selectedOption.quantity;
     const totalOriginalPrice = selectedOption.originalPrice * selectedOption.quantity;
+    ReactPixel.track('AddToCart', {
+      content_name: PRODUCT.name, // wstaw zmienną z nazwą
+      content_ids: PRODUCT.id,   // wstaw zmienną z ID
+      content_type: 'product',
+      value: totalPrice,                   // wstaw zmienną z ceną (typ number)
+      currency: 'PLN'
+    });
     addItem({
       id: `${PRODUCT.id}-${selectedBundle}`,
       name: selectedOption.quantity > 1 
@@ -198,7 +206,7 @@ const ProductPage = () => {
         {/* Product Details Section */}
         <section className="mt-16 md:mt-24">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-8">
-            Dlaczego <span className="text-gold-gradient">Radianté Lux290</span>?
+            Dlaczego <span className="text-gold-gradient">Radianté Lux240</span>?
           </h2>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
