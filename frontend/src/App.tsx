@@ -28,7 +28,7 @@ const FacebookPixelTracker = () => {
 
   useEffect(() => {
     // Inicjalizacja Pixela - WKLEJ SWÓJ NUMER ID PONIŻEJ
-    ReactPixel.init('470424833648423', undefined, { debug: true, autoConfig: true });
+    ReactPixel.init('2985702081629623', undefined, { debug: true, autoConfig: true });
   }, []);
 
   useEffect(() => {
